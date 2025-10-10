@@ -46,6 +46,12 @@ function updateDisplay(){
 }
 
 function appendNumber(num){
+    if(current.startsWith('Error')){
+        current = '';
+        previous = '';
+        operator = null;
+    }
+
     if(num === '.' && current.includes('.')){
         return;
     }
@@ -54,6 +60,11 @@ function appendNumber(num){
 }
 
 function chooseOperator(op){
+    if(current.startsWith('Error')){
+        clearAll;
+        return;
+    }
+
     if(op === 'x'){
         op = '*';
     }
@@ -128,6 +139,10 @@ function clearAll(){
 }
 
 function backspace(){
+    if(current.startsWith('Error')){
+        clearAll();
+        return;
+    }
     current = current.slice(0, -1);
     updateDisplay();
 }
