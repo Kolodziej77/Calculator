@@ -4,6 +4,7 @@ const historyDisplay = document.getElementById('history');
 let current = '';
 let previous = '';
 let operator = null;
+let resetNext = false;
 
 function add(a, b){
     return a + b;
@@ -46,10 +47,12 @@ function updateDisplay(){
 }
 
 function appendNumber(num){
-    if(current.startsWith('Error')){
+    if(current.startsWith('Error') || resetNext){
         current = '';
         previous = '';
         operator = null;
+        resetNext = false;
+        updateHistory();
     }
 
     if(num === '.' && current.includes('.')){
@@ -60,8 +63,12 @@ function appendNumber(num){
 }
 
 function chooseOperator(op){
+    if(resetNext){
+        resetNext = false;
+    }
+    
     if(current.startsWith('Error')){
-        clearAll;
+        clearAll();
         return;
     }
 
@@ -69,8 +76,8 @@ function chooseOperator(op){
         op = '*';
     }
 
-    if(previous !== '' && current !== ''){
-        const result = operate(operator, previous, current);
+    if(previous !== '' && current !== '' && operator !== null){
+        const result = operate(operator, previous, current);    
         if(typeof result === 'string'){
             current = result;
             updateDisplay();
@@ -127,6 +134,7 @@ function compute(){
     current = String(result);
     previous = '';
     operator = null;
+    resetNext = true;
     updateDisplay();
 }
 
