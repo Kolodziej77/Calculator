@@ -42,7 +42,7 @@ document.querySelectorAll('.btn').forEach(button => {
 })
 
 function updateDisplay(){
-    display.textContent = current;
+    display.textContent = current || '0';
 }
 
 function appendNumber(num){
@@ -54,9 +54,29 @@ function appendNumber(num){
 }
 
 function chooseOperator(op){
+    if(op === 'x'){
+        op = '*';
+    }
+
+    if(previous !== '' && current !== ''){
+        const result = operate(operator, previous, current);
+        if(typeof result === 'string'){
+            current = result;
+            updateDisplay();
+            previous = '';
+            operator = null;
+            updateHistory();
+            return;
+        }
+        previous = String(result);
+        current = '';
+    } else if(current !== ''){
+        previous = current;
+        current = '';
+    }
+
     operator = op;
-    previous = current;
-    current = '';
+    updateHistory(previous, operator === '*' ? 'x' : operator);
 }
 
 function operate(op, a, b){
@@ -80,10 +100,22 @@ function compute(){
     if(operator === null || current === '' || previous === ''){
         return;
     }
+
     const result = operate(operator, previous, current);
+
+    if(typeof result === 'string'){
+        current = result;
+        updateDisplay();
+        previous = '';
+        operator = null;
+        updateHistory();
+        return;
+    }
+
+    updateHistory(previous, operator === '*' ? 'x' : operator, current);
     current = String(result);
-    operator = null;
     previous = '';
+    operator = null;
     updateDisplay();
 }
 
@@ -92,9 +124,20 @@ function clearAll(){
     previous = '';
     operator = null;
     updateDisplay();
+    updateHistory();
 }
 
 function backspace(){
     current = current.slice(0, -1);
     updateDisplay();
+}
+
+function updateHistory(op1, opSign, op2){
+    if(op1 && opSign && op2 !== undefined){
+        historyDisplay.textContent = `${op1} ${opSign} ${op2} =`;
+    } else if(op1 && opSign){
+        historyDisplay.textContent = `${op1} ${opSign}`;
+    } else{
+        historyDisplay.textContent = '';
+    }
 }
