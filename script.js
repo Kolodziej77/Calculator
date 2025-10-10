@@ -58,6 +58,11 @@ function appendNumber(num){
     if(num === '.' && current.includes('.')){
         return;
     }
+    
+    if(current.length >= 22){
+        return;
+    }
+
     current += num;
     updateDisplay();
 }
@@ -66,7 +71,7 @@ function chooseOperator(op){
     if(resetNext){
         resetNext = false;
     }
-    
+
     if(current.startsWith('Error')){
         clearAll();
         return;
@@ -86,7 +91,7 @@ function chooseOperator(op){
             updateHistory();
             return;
         }
-        previous = String(result);
+        previous = String(roundResult(result));
         current = '';
     } else if(current !== ''){
         previous = current;
@@ -131,7 +136,7 @@ function compute(){
     }
 
     updateHistory(previous, operator === '*' ? 'x' : operator, current);
-    current = String(result);
+    current = String(roundResult(result));
     previous = '';
     operator = null;
     resetNext = true;
@@ -164,3 +169,39 @@ function updateHistory(op1, opSign, op2){
         historyDisplay.textContent = '';
     }
 }
+
+function roundResult(result){
+    if(typeof result === 'string'){
+        return result;
+    }
+
+    return Math.round(result * 100000) / 100000;
+}
+
+window.addEventListener('keydown', (e) => {
+    const key = e.key;
+
+    if(!isNaN(key)){
+        appendNumber(key);
+    }
+    if(key === '.' || key === ','){
+        appendNumber('.');
+    }
+    if(key === '+' ||
+        key === '-' ||
+        key === '*' ||
+        key === '/' ||
+        key === 'x' ||
+        key === 'X'){
+            chooseOperator(key === 'x' || key === 'X' ? '*' : key);
+    }
+    if(key === 'Enter'){
+        compute();
+    }
+    if(key === 'Backspace'){
+        backspace();
+    }
+    if(key === 'c' || key === 'C'){
+        clearAll();
+    }
+})
